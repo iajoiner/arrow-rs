@@ -14,14 +14,16 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
+#![cfg_attr(not(feature = "std"), no_std)]
 #![warn(missing_docs)]
 //! Arrow logical types
+
+extern crate alloc;
 
 mod datatype;
 
 pub use datatype::*;
-use std::fmt::Display;
+use core::fmt::Display;
 mod datatype_parse;
 mod error;
 pub use error::*;
@@ -32,7 +34,7 @@ mod fields;
 pub use fields::*;
 mod schema;
 pub use schema::*;
-use std::ops;
+use core::ops;
 
 #[cfg(feature = "ffi")]
 pub mod ffi;
@@ -83,7 +85,7 @@ pub struct SortOptions {
 }
 
 impl Display for SortOptions {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+    fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         if self.descending {
             write!(f, "DESC")?;
         } else {

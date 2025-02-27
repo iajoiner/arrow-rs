@@ -15,7 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-use std::{fmt::Display, iter::Peekable, str::Chars, sync::Arc};
+use alloc::sync::Arc;
+use core::{fmt::Display, iter::Peekable, str::Chars};
 
 use crate::{ArrowError, DataType, Field, IntervalUnit, TimeUnit};
 
@@ -549,7 +550,7 @@ enum Token {
 }
 
 impl Display for Token {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Token::SimpleType(t) => write!(f, "{t}"),
             Token::List => write!(f, "List"),

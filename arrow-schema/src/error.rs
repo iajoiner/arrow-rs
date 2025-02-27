@@ -16,10 +16,11 @@
 // under the License.
 
 //! Defines `ArrowError` for representing failures in various Arrow operations.
-use std::fmt::{Debug, Display, Formatter};
+use core::fmt::{Debug, Display, Formatter};
+#[cfg(feature = "std")]
 use std::io::Write;
 
-use std::error::Error;
+use core::error::Error;
 
 /// Many different operations in the `arrow` crate return this error type.
 #[derive(Debug)]
@@ -46,6 +47,7 @@ pub enum ArrowError {
     CsvError(String),
     /// Error during JSON-related operations.
     JsonError(String),
+    #[cfg(feature = "std")]
     /// Error during IO operations.
     IoError(String, std::io::Error),
     /// Error during IPC operations in `arrow-ipc` or `arrow-flight`.
@@ -69,24 +71,26 @@ impl ArrowError {
     }
 }
 
+#[cfg(feature = "std")]
 impl From<std::io::Error> for ArrowError {
     fn from(error: std::io::Error) -> Self {
         ArrowError::IoError(error.to_string(), error)
     }
 }
 
-impl From<std::str::Utf8Error> for ArrowError {
-    fn from(error: std::str::Utf8Error) -> Self {
+impl From<core::str::Utf8Error> for ArrowError {
+    fn from(error: core::str::Utf8Error) -> Self {
         ArrowError::ParseError(error.to_string())
     }
 }
 
-impl From<std::string::FromUtf8Error> for ArrowError {
-    fn from(error: std::string::FromUtf8Error) -> Self {
+impl From<alloc::string::FromUtf8Error> for ArrowError {
+    fn from(error: alloc::string::FromUtf8Error) -> Self {
         ArrowError::ParseError(error.to_string())
     }
 }
 
+#[cfg(feature = "std")]
 impl<W: Write> From<std::io::IntoInnerError<W>> for ArrowError {
     fn from(error: std::io::IntoInnerError<W>) -> Self {
         ArrowError::IoError(error.to_string(), error.into())
@@ -94,7 +98,7 @@ impl<W: Write> From<std::io::IntoInnerError<W>> for ArrowError {
 }
 
 impl Display for ArrowError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         match self {
             ArrowError::NotYetImplemented(source) => {
                 write!(f, "Not yet implemented: {}", &source)

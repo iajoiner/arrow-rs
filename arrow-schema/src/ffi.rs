@@ -38,12 +38,10 @@ use crate::{
     ArrowError, DataType, Field, FieldRef, IntervalUnit, Schema, TimeUnit, UnionFields, UnionMode,
 };
 use bitflags::bitflags;
-use std::borrow::Cow;
-use std::sync::Arc;
-use std::{
-    collections::HashMap,
-    ffi::{c_char, c_void, CStr, CString},
-};
+use core::borrow::Cow;
+use alloc::sync::Arc;
+use hashbrown::HashMap;
+use std::ffi::{c_char, c_void, CStr, CString};
 
 bitflags! {
     /// Flags for [`FFI_ArrowSchema`]
@@ -142,7 +140,7 @@ impl FFI_ArrowSchema {
 
         let dictionary_ptr = dictionary
             .map(|d| Box::into_raw(Box::new(d)))
-            .unwrap_or(std::ptr::null_mut());
+            .unwrap_or(core::ptr::null_mut());
 
         let mut private_data = Box::new(SchemaPrivateData {
             children: children_ptr,
@@ -216,7 +214,7 @@ impl FFI_ArrowSchema {
             self.metadata = metadata_serialized.as_ptr() as *const c_char;
             Some(metadata_serialized)
         } else {
-            self.metadata = std::ptr::null_mut();
+            self.metadata = core::ptr::null_mut();
             None
         };
 
@@ -240,23 +238,23 @@ impl FFI_ArrowSchema {
     /// * `schema` must point to a properly initialized value of [`FFI_ArrowSchema`]
     ///
     /// [move]: https://arrow.apache.org/docs/format/CDataInterface.html#moving-an-array
-    /// [valid]: https://doc.rust-lang.org/std/ptr/index.html#safety
+    /// [valid]: https://doc.rust-lang.org/core/ptr/index.html#safety
     pub unsafe fn from_raw(schema: *mut FFI_ArrowSchema) -> Self {
-        std::ptr::replace(schema, Self::empty())
+        core::ptr::replace(schema, Self::empty())
     }
 
     /// Create an empty [`FFI_ArrowSchema`]
     pub fn empty() -> Self {
         Self {
-            format: std::ptr::null_mut(),
-            name: std::ptr::null_mut(),
-            metadata: std::ptr::null_mut(),
+            format: core::ptr::null_mut(),
+            name: core::ptr::null_mut(),
+            metadata: core::ptr::null_mut(),
             flags: 0,
             n_children: 0,
-            children: std::ptr::null_mut(),
-            dictionary: std::ptr::null_mut(),
+            children: core::ptr::null_mut(),
+            dictionary: core::ptr::null_mut(),
             release: None,
-            private_data: std::ptr::null_mut(),
+            private_data: core::ptr::null_mut(),
         }
     }
 
@@ -359,7 +357,7 @@ impl FFI_ArrowSchema {
 
             fn next_n_bytes(buffer: *const u8, pos: &mut isize, n: i32) -> &[u8] {
                 let out = unsafe {
-                    std::slice::from_raw_parts(buffer.offset(*pos), n.try_into().unwrap())
+                    core::slice::from_raw_parts(buffer.offset(*pos), n.try_into().unwrap())
                 };
                 *pos += isize::try_from(n).unwrap();
                 out

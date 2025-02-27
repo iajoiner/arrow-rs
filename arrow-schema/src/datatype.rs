@@ -15,9 +15,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
-use std::fmt;
-use std::str::FromStr;
-use std::sync::Arc;
+use core::fmt;
+use core::str::FromStr;
+use alloc::sync::Arc;
 
 use crate::{ArrowError, Field, FieldRef, Fields, UnionFields};
 
@@ -696,7 +696,7 @@ impl DataType {
     ///
     /// Includes the size of `Self`.
     pub fn size(&self) -> usize {
-        std::mem::size_of_val(self)
+        core::mem::size_of_val(self)
             + match self {
                 DataType::Null
                 | DataType::Boolean
@@ -737,8 +737,8 @@ impl DataType {
                 DataType::Union(fields, _) => fields.size(),
                 DataType::Dictionary(dt1, dt2) => dt1.size() + dt2.size(),
                 DataType::RunEndEncoded(run_ends, values) => {
-                    run_ends.size() - std::mem::size_of_val(run_ends) + values.size()
-                        - std::mem::size_of_val(values)
+                    run_ends.size() - core::mem::size_of_val(run_ends) + values.size()
+                        - core::mem::size_of_val(values)
                 }
             }
     }
@@ -822,7 +822,7 @@ mod tests {
     #[test]
     #[cfg(feature = "serde")]
     fn serde_struct_type() {
-        use std::collections::HashMap;
+        use hashbrown::HashMap;
 
         let kv_array = [("k".to_string(), "v".to_string())];
         let field_metadata: HashMap<String, String> = kv_array.iter().cloned().collect();
@@ -1099,7 +1099,7 @@ mod tests {
 
     #[test]
     fn size_should_not_regress() {
-        assert_eq!(std::mem::size_of::<DataType>(), 24);
+        assert_eq!(core::mem::size_of::<DataType>(), 24);
     }
 
     #[test]
